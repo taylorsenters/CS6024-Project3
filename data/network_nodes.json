@@ -1,0 +1,102 @@
+[
+  {
+    "id": "Sheldon",
+    "lines": 11482,
+    "strength": 77018
+  },
+  {
+    "id": "Leonard",
+    "lines": 9638,
+    "strength": 70976
+  },
+  {
+    "id": "Penny",
+    "lines": 7477,
+    "strength": 54863
+  },
+  {
+    "id": "Howard",
+    "lines": 5737,
+    "strength": 48780
+  },
+  {
+    "id": "Raj",
+    "lines": 4576,
+    "strength": 40283
+  },
+  {
+    "id": "Amy",
+    "lines": 3419,
+    "strength": 27766
+  },
+  {
+    "id": "Bernadette",
+    "lines": 2636,
+    "strength": 23356
+  },
+  {
+    "id": "Stuart",
+    "lines": 726,
+    "strength": 6652
+  },
+  {
+    "id": "(off)",
+    "lines": 218,
+    "strength": 2083
+  },
+  {
+    "id": "Priya",
+    "lines": 213,
+    "strength": 1715
+  },
+  {
+    "id": "Cooper",
+    "lines": 213,
+    "strength": 1341
+  },
+  {
+    "id": "Emily",
+    "lines": 162,
+    "strength": 1424
+  },
+  {
+    "id": "Beverley",
+    "lines": 159,
+    "strength": 1103
+  },
+  {
+    "id": "Zack",
+    "lines": 133,
+    "strength": 1189
+  },
+  {
+    "id": "Arthur",
+    "lines": 130,
+    "strength": 827
+  },
+  {
+    "id": "Wil",
+    "lines": 125,
+    "strength": 1061
+  },
+  {
+    "id": "Man",
+    "lines": 108,
+    "strength": 956
+  },
+  {
+    "id": "Leslie",
+    "lines": 107,
+    "strength": 742
+  },
+  {
+    "id": "Kripke",
+    "lines": 103,
+    "strength": 816
+  },
+  {
+    "id": "Koothrappali",
+    "lines": 100,
+    "strength": 637
+  }
+]
