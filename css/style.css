@@ -1,0 +1,31 @@
+/* page style */
+body {
+    font-family: Arial;
+    background-color: #0b1a2b;
+    color: white;
+
+    /* grid layout */
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* section boxes */
+#overview, #characterCharts, #episodeCharts {
+    background-color: #122b45;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* bars */
+.bar {
+    margin: 5px;
+    padding: 5px;
+    background-color: orange;
+}
+
+/* hover */
+.bar:hover {
+    opacity: 0.7;
+    cursor: pointer;
+}
