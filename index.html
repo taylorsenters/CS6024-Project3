@@ -12,17 +12,29 @@
 
 <body>
 
-    <!-- title -->
-    <h1>The Big Bang Theory Dashboard</h1>
+    <main class="page-shell">
+        <!-- title -->
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">TV Series Dashboard</p>
+                <h1>The Big Bang Theory Dashboard</h1>
+                <p class="hero-text">
+                    Explore the show theme, the core cast, and episode-level character usage.
+                </p>
+                <!-- overview section -->
+                <div id="overview"></div>
+            </div>
+        </section>
 
-    <!-- overview section -->
-    <div id="overview"></div>
+        <!-- character gallery -->
+        <section id="characterGallery"></section>
 
-    <!-- character charts -->
-    <div id="characterCharts"></div>
+        <!-- character charts -->
+        <div id="characterCharts"></div>
 
-    <!-- episode charts -->
-    <div id="episodeCharts"></div>
+        <!-- episode charts -->
+        <div id="episodeCharts"></div>
+    </main>
 
     <!-- load script -->
     <script src="js/main.js"></script>

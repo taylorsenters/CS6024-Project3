@@ -4,6 +4,86 @@ let globalState = {
     selectedCharacter: null
 };
 
+let characterCards = [
+    {
+        name: "Sheldon",
+        image: "images/Sheldon.png",
+        title: "Theoretical physicist at Caltech",
+        facts: [
+            "Full name: Sheldon Lee Cooper",
+            "Born in Galveston, Texas",
+            "Education: multiple advanced degrees, including a Ph.D.",
+            "Spouse: Amy Farrah Fowler"
+        ]
+    },
+    {
+        name: "Leonard",
+        image: "images/Leonard.png",
+        title: "Experimental physicist",
+        facts: [
+            "Full name: Leonard Leakey Hofstadter",
+            "Originally from New Jersey",
+            "Earned his Ph.D. at Princeton University",
+            "Spouse: Penny Hofstadter"
+        ]
+    },
+    {
+        name: "Penny",
+        image: "images/Penny.png",
+        title: "Actress, waitress, and sales representative",
+        facts: [
+            "Full name: Penelope \"Penny\" Hofstadter",
+            "Originally from outside Omaha, Nebraska",
+            "Worked at the Cheesecake Factory before moving into sales",
+            "Spouse: Leonard Hofstadter"
+        ]
+    },
+    {
+        name: "Howard",
+        image: "images/Howard.png",
+        title: "Aerospace engineer and astronaut",
+        facts: [
+            "Full name: Howard Joel Wolowitz",
+            "Education: M.Eng. from MIT",
+            "Worked as an aerospace engineer at Caltech",
+            "Spouse: Bernadette Rostenkowski-Wolowitz"
+        ]
+    },
+    {
+        name: "Raj",
+        image: "images/Raj.png",
+        title: "Astrophysicist",
+        facts: [
+            "Full name: Rajesh Ramayan Koothrappali",
+            "Originally from New Delhi, India",
+            "Studied at the University of Cambridge",
+            "Works in Caltech's physics department",
+        ]
+    },
+    {
+        name: "Bernadette",
+        image: "images/Bernadette.png",
+        title: "Microbiologist",
+        facts: [
+            "Full name: Bernadette Maryann Rostenkowski-Wolowitz",
+            "Earned a Ph.D. in microbiology",
+            "Originally a waitress at the Cheesecake Factory",
+            "Spouse: Howard Wolowitz"
+        ]
+    },
+    {
+        name: "Amy",
+        image: "images/Amy.png",
+        title: "Neuroscientist",
+        facts: [
+            "Full name: Amy Farrah Fowler",
+            "Ph.D. in neurobiology",
+            "Research focus: addiction in primates and invertebrates",
+            "Spouse: Sheldon Cooper"
+        ]
+    }
+];
+
 // load your cleaned dataset
 d3.csv("data/tbbt_cleaned_data.csv").then(data => {
 
@@ -17,9 +97,42 @@ d3.csv("data/tbbt_cleaned_data.csv").then(data => {
 
     globalState.data = data;
 
+    renderCharacterGallery();
     renderOverview();
     renderCharacterCharts();
 });
+
+
+// character gallery
+function renderCharacterGallery() {
+
+    let div = document.getElementById("characterGallery");
+
+    div.innerHTML = `
+        <h2>Main Characters</h2>
+        <p class="gallery-note">Hover over each character to see key character facts.</p>
+        <div class="character-grid"></div>
+    `;
+
+    let grid = div.querySelector(".character-grid");
+
+    characterCards.forEach(character => {
+        let card = document.createElement("article");
+        card.className = "character-card";
+        card.innerHTML = `
+            <img src="${character.image}" alt="${character.name}">
+            <div class="character-overlay">
+                <h3>${character.name}</h3>
+                <p class="character-title">${character.title}</p>
+                <ul class="character-facts">
+                    ${character.facts.map(fact => `<li>${fact}</li>`).join("")}
+                </ul>
+            </div>
+        `;
+
+        grid.appendChild(card);
+    });
+}
 
 
 // show overview
@@ -29,10 +142,10 @@ function renderOverview() {
 
     div.innerHTML = `
         <h2>Overview</h2>
-        <p>Series: The Big Bang Theory</p>
-        <p>Run: September 24, 2007 – May 16, 2019</p>
-        <p>Total Episodes: 279</p>
-        <p>Genre: Sitcom</p>
+        <p><strong>Series:</strong> The Big Bang Theory</p>
+        <p><strong>Run:</strong> September 24, 2007 – May 16, 2019</p>
+        <p><strong>Total Episodes:</strong> 279</p>
+        <p><strong>Genre:</strong> Sitcom</p>
     `;
 }
 
