@@ -1,8 +1,20 @@
 // global state
 let globalState = {
     data: [],
-    selectedCharacter: null
+    selectedCharacter: null,
+    selectedSeason: null
 };
+
+const THEME_SONG_FIRST_LOAD_KEY = "tbbtThemeSongFirstLoadDone";
+const MAIN_CHARACTERS = new Set([
+    "Sheldon",
+    "Leonard",
+    "Penny",
+    "Howard",
+    "Raj",
+    "Bernadette",
+    "Amy"
+]);
 
 let characterCards = [
     {
@@ -84,6 +96,8 @@ let characterCards = [
     }
 ];
 
+initializeThemeSongOnFirstLoad();
+
 // load your cleaned dataset
 d3.csv("data/tbbt_cleaned_data.csv").then(data => {
 
@@ -100,7 +114,63 @@ d3.csv("data/tbbt_cleaned_data.csv").then(data => {
     renderCharacterGallery();
     renderOverview();
     renderCharacterCharts();
+    renderEpisodeCharts();
 });
+
+
+function initializeThemeSongOnFirstLoad() {
+
+    if (localStorage.getItem(THEME_SONG_FIRST_LOAD_KEY) === "true") {
+        return;
+    }
+
+    let themeSong = new Audio("audio/theme_song.m4a");
+    themeSong.preload = "auto";
+    themeSong.volume = 0.6;
+
+    themeSong.play()
+        .then(() => {
+            localStorage.setItem(THEME_SONG_FIRST_LOAD_KEY, "true");
+        })
+        .catch(() => {
+            showThemeSongPrompt(themeSong);
+        });
+}
+
+
+function showThemeSongPrompt(themeSong) {
+
+    if (document.getElementById("themeSongPrompt")) {
+        return;
+    }
+
+    let container = document.querySelector(".hero-copy");
+    if (!container) {
+        return;
+    }
+
+    let prompt = document.createElement("div");
+    prompt.id = "themeSongPrompt";
+    prompt.className = "theme-song-prompt";
+    prompt.innerHTML = `
+        <p>Click to play the theme song.</p>
+        <button type="button" class="theme-song-button">Play Theme Song</button>
+    `;
+
+    let button = prompt.querySelector("button");
+    button.onclick = () => {
+        themeSong.play()
+            .then(() => {
+                localStorage.setItem(THEME_SONG_FIRST_LOAD_KEY, "true");
+                prompt.remove();
+            })
+            .catch(() => {
+                button.textContent = "Playback blocked by browser";
+            });
+    };
+
+    container.appendChild(prompt);
+}
 
 
 // character gallery
@@ -110,7 +180,6 @@ function renderCharacterGallery() {
 
     div.innerHTML = `
         <h2>Main Characters</h2>
-        <p class="gallery-note">Hover over each character to see key character facts.</p>
         <div class="character-grid"></div>
     `;
 
@@ -121,6 +190,7 @@ function renderCharacterGallery() {
         card.className = "character-card";
         card.innerHTML = `
             <img src="${character.image}" alt="${character.name}">
+            <div class="character-nameplate">${character.name}</div>
             <div class="character-overlay">
                 <h3>${character.name}</h3>
                 <p class="character-title">${character.title}</p>
@@ -142,7 +212,7 @@ function renderOverview() {
 
     div.innerHTML = `
         <h2>Overview</h2>
-        <p><strong>Series:</strong> The Big Bang Theory</p>
+        <p><strong>Original Network:</strong> CBS</p>
         <p><strong>Run:</strong> September 24, 2007 – May 16, 2019</p>
         <p><strong>Total Episodes:</strong> 279</p>
         <p><strong>Genre:</strong> Sitcom</p>
@@ -154,76 +224,163 @@ function renderOverview() {
 function renderCharacterCharts() {
 
     let div = document.getElementById("characterCharts");
-    div.innerHTML = "<h2>Character Importance</h2>";
+    div.innerHTML = `
+        <h2>Character Importance (Overall & By Season)</h2>
+        <p class="chart-note">Episodes = number of unique episodes a character appears in. Speaking volume = total word count from dialogue.</p>
+        <div class="season-filter">
+            <label for="seasonSelect">Season:</label>
+            <select id="seasonSelect"></select>
+        </div>
+        <div class="importance-section">
+            <h3>Overall</h3>
+            <div class="importance-grid">
+                <div>
+                    <h4>Episode Appearances (Overall)</h4>
+                    <div id="overallEpisodesChart"></div>
+                </div>
+                <div>
+                    <h4>Word Count (Overall)</h4>
+                    <div id="overallWordsChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="importance-section">
+            <h3>By Season</h3>
+            <div class="importance-grid">
+                <div>
+                    <h4>Episode Appearances (Selected Season)</h4>
+                    <div id="seasonEpisodesChart"></div>
+                </div>
+                <div>
+                    <h4>Word Count (Selected Season)</h4>
+                    <div id="seasonWordsChart"></div>
+                </div>
+            </div>
+        </div>
+    `;
 
-    let data = globalState.data;
+    let filtered = cleanCharacterRows(globalState.data);
+    let overallStats = buildCharacterStats(filtered);
 
-    // clean bad names
-    let filtered = data.filter(d =>
+    let seasons = Array.from(new Set(filtered.map(d => d.Season))).sort((a, b) => a - b);
+    if (!globalState.selectedSeason || !seasons.includes(globalState.selectedSeason)) {
+        globalState.selectedSeason = seasons[0];
+    }
+
+    let seasonSelect = document.getElementById("seasonSelect");
+    seasonSelect.innerHTML = seasons
+        .map(season => `<option value="${season}">${season}</option>`)
+        .join("");
+    seasonSelect.value = String(globalState.selectedSeason);
+    seasonSelect.onchange = (event) => {
+        globalState.selectedSeason = +event.target.value;
+        renderCharacterCharts();
+    };
+
+    let seasonStats = buildCharacterStats(
+        filtered.filter(d => d.Season === globalState.selectedSeason)
+    );
+
+    renderImportanceBars(
+        document.getElementById("overallEpisodesChart"),
+        overallStats,
+        "episodes",
+        "episodes"
+    );
+    renderImportanceBars(
+        document.getElementById("overallWordsChart"),
+        overallStats,
+        "words",
+        "words"
+    );
+    renderImportanceBars(
+        document.getElementById("seasonEpisodesChart"),
+        seasonStats,
+        "episodes",
+        "episodes"
+    );
+    renderImportanceBars(
+        document.getElementById("seasonWordsChart"),
+        seasonStats,
+        "words",
+        "words"
+    );
+}
+
+
+function cleanCharacterRows(data) {
+    return data.filter(d =>
         d.Character &&
+        MAIN_CHARACTERS.has(d.Character) &&
         !d.Character.includes("(") &&
         !d.Character.includes(")") &&
         d.Character.length < 20
     );
+}
 
-    let grouped = d3.group(filtered, d => d.Character);
 
-    let characterStats = [];
+function buildCharacterStats(data) {
+
+    let grouped = d3.group(data, d => d.Character);
+    let stats = [];
 
     grouped.forEach((values, character) => {
-
         let totalWords = d3.sum(values, d => d.wordCount);
+        let episodesSet = new Set(values.map(d => d.Season + "-" + d.Episode));
 
-        let episodesSet = new Set(
-            values.map(d => d.Season + "-" + d.Episode)
-        );
-
-        let totalEpisodes = episodesSet.size;
-
-        characterStats.push({
+        stats.push({
             character: character,
             words: totalWords,
-            episodes: totalEpisodes
+            episodes: episodesSet.size
         });
     });
 
-    // sort by importance
-    characterStats.sort((a, b) => b.words - a.words);
+    stats.sort((a, b) => b.words - a.words);
+    return stats;
+}
 
-    // show top 8
-    characterStats = characterStats.slice(0, 8);
 
-    characterStats.forEach(c => {
+function renderImportanceBars(container, stats, metricKey, metricLabel) {
 
-        let bar1 = document.createElement("div");
-        bar1.className = "bar";
-        bar1.style.width = c.episodes * 4 + "px";
-        bar1.innerText = c.character + " (" + c.episodes + " episodes)";
+    container.innerHTML = "";
 
-        bar1.title = "click to see episodes";
+    if (!stats.length) {
+        container.innerHTML = "<p>No data available.</p>";
+        return;
+    }
 
-        bar1.onclick = () => {
-            globalState.selectedCharacter = c.character;
+    let maxValue = d3.max(stats, d => d[metricKey]) || 1;
+
+    stats.forEach(stat => {
+        let row = document.createElement("div");
+        row.className = "importance-row";
+
+        if (globalState.selectedCharacter === stat.character) {
+            row.classList.add("selected");
+        }
+
+        row.title = "Click to see episode-level details";
+        row.onclick = () => {
+            globalState.selectedCharacter = stat.character;
             renderEpisodeCharts();
             renderCharacterCharts();
 
-            // scroll to episode section
             document.getElementById("episodeCharts").scrollIntoView({
                 behavior: "smooth"
             });
         };
 
-        if (globalState.selectedCharacter === c.character) {
-            bar1.style.border = "2px solid yellow";
-        }
+        let widthPercent = (stat[metricKey] / maxValue) * 100;
 
-        let bar2 = document.createElement("div");
-        bar2.className = "bar";
-        bar2.style.width = c.words / 40 + "px";
-        bar2.innerText = c.character + " words: " + c.words;
+        row.innerHTML = `
+            <div class="importance-row-label">${stat.character}</div>
+            <div class="importance-row-track">
+                <div class="importance-row-fill" style="width: ${widthPercent}%;"></div>
+            </div>
+            <div class="importance-row-value">${stat[metricKey]} ${metricLabel}</div>
+        `;
 
-        div.appendChild(bar1);
-        div.appendChild(bar2);
+        container.appendChild(row);
     });
 }
 
