@@ -1,0 +1,60 @@
+.bar {
+    margin: 5px;
+    padding: 5px;
+    background-color: orange;
+}
+
+.bar:hover {
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.episode-selected {
+    outline: 2px solid rgba(255, 214, 102, 0.9);
+}
+
+.episode-details-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.word-cloud-panel {
+    background: rgba(8, 19, 31, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.word-cloud-panel h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+}
+
+.word-cloud-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    align-items: center;
+    align-content: flex-start;
+    min-height: 220px;
+}
+
+.word-chip {
+    display: inline-block;
+    line-height: 1;
+    color: #f8fcff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.word-cloud-placeholder {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 900px) {
+    .episode-details-layout {
+        grid-template-columns: 1fr;
+    }
+}

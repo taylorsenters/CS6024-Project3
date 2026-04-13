@@ -1,0 +1,92 @@
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+}
+
+.character-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    min-height: 320px;
+    background: #06101a;
+}
+
+.character-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center top;
+    display: block;
+    background: linear-gradient(180deg, rgba(6, 16, 26, 0.95) 0%, rgba(10, 24, 38, 0.92) 100%);
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.character-nameplate {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 2;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(7, 18, 29, 0.56);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.96rem;
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+
+.character-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 48px 14px 16px;
+    background: rgba(7, 18, 29, 0.94);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    overflow-y: auto;
+}
+
+.character-card:hover img {
+    transform: scale(1.04);
+    filter: saturate(1.05);
+}
+
+.character-card:hover .character-overlay,
+.character-card:focus-within .character-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.character-overlay h3 {
+    margin: 0;
+    font-size: 1.28rem;
+    color: #ffffff;
+}
+
+.character-title {
+    margin: 8px 0;
+    color: #ffd766;
+    font-size: 0.98rem;
+    font-weight: 700;
+}
+
+.character-facts {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    line-height: 1.55;
+    font-size: 0.96rem;
+    color: rgba(255, 255, 255, 0.96);
+}
+
+.character-facts li + li {
+    margin-top: 4px;
+}

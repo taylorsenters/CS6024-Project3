@@ -228,83 +228,106 @@ function renderCharacterCharts() {
         <h2>Character Importance (Overall & By Season)</h2>
         <p class="chart-note">Episodes = number of unique episodes a character appears in. Speaking volume = total word count from dialogue.</p>
         <div class="season-filter">
-            <label for="seasonSelect">Season:</label>
+            <label for="seasonSelect">View:</label>
             <select id="seasonSelect"></select>
         </div>
-        <div class="importance-section">
-            <h3>Overall</h3>
-            <div class="importance-grid">
-                <div>
-                    <h4>Episode Appearances (Overall)</h4>
-                    <div id="overallEpisodesChart"></div>
-                </div>
-                <div>
-                    <h4>Word Count (Overall)</h4>
-                    <div id="overallWordsChart"></div>
-                </div>
-            </div>
-        </div>
-        <div class="importance-section">
-            <h3>By Season</h3>
-            <div class="importance-grid">
-                <div>
-                    <h4>Episode Appearances (Selected Season)</h4>
-                    <div id="seasonEpisodesChart"></div>
-                </div>
-                <div>
-                    <h4>Word Count (Selected Season)</h4>
-                    <div id="seasonWordsChart"></div>
-                </div>
-            </div>
-        </div>
+        <div id="importanceContent"></div>
     `;
 
     let filtered = cleanCharacterRows(globalState.data);
     let overallStats = buildCharacterStats(filtered);
 
     let seasons = Array.from(new Set(filtered.map(d => d.Season))).sort((a, b) => a - b);
-    if (!globalState.selectedSeason || !seasons.includes(globalState.selectedSeason)) {
-        globalState.selectedSeason = seasons[0];
+
+    if (!globalState.selectedSeason) {
+        globalState.selectedSeason = "overall";
+    }
+
+    if (
+        globalState.selectedSeason !== "overall" &&
+        !seasons.includes(+globalState.selectedSeason)
+    ) {
+        globalState.selectedSeason = "overall";
     }
 
     let seasonSelect = document.getElementById("seasonSelect");
-    seasonSelect.innerHTML = seasons
-        .map(season => `<option value="${season}">${season}</option>`)
+    seasonSelect.innerHTML = [`<option value="overall">Overall</option>`]
+        .concat(seasons.map(season => `<option value="${season}">Season ${season}</option>`))
         .join("");
+
     seasonSelect.value = String(globalState.selectedSeason);
     seasonSelect.onchange = (event) => {
-        globalState.selectedSeason = +event.target.value;
+        globalState.selectedSeason = event.target.value;
         renderCharacterCharts();
     };
 
-    let seasonStats = buildCharacterStats(
-        filtered.filter(d => d.Season === globalState.selectedSeason)
-    );
+    let importanceContent = document.getElementById("importanceContent");
 
-    renderImportanceBars(
-        document.getElementById("overallEpisodesChart"),
-        overallStats,
-        "episodes",
-        "episodes"
-    );
-    renderImportanceBars(
-        document.getElementById("overallWordsChart"),
-        overallStats,
-        "words",
-        "words"
-    );
-    renderImportanceBars(
-        document.getElementById("seasonEpisodesChart"),
-        seasonStats,
-        "episodes",
-        "episodes"
-    );
-    renderImportanceBars(
-        document.getElementById("seasonWordsChart"),
-        seasonStats,
-        "words",
-        "words"
-    );
+    // Simple if/else: show either Overall charts or selected Season charts.
+    if (globalState.selectedSeason === "overall") {
+        importanceContent.innerHTML = `
+            <div class="importance-section">
+                <h3>Overall</h3>
+                <div class="importance-grid">
+                    <div>
+                        <h4>Episode Appearances (Overall)</h4>
+                        <div id="overallEpisodesChart"></div>
+                    </div>
+                    <div>
+                        <h4>Word Count (Overall)</h4>
+                        <div id="overallWordsChart"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        renderImportanceBars(
+            document.getElementById("overallEpisodesChart"),
+            overallStats,
+            "episodes",
+            "episodes"
+        );
+        renderImportanceBars(
+            document.getElementById("overallWordsChart"),
+            overallStats,
+            "words",
+            "words"
+        );
+    } else {
+        let selectedSeasonNumber = +globalState.selectedSeason;
+        let seasonStats = buildCharacterStats(
+            filtered.filter(d => d.Season === selectedSeasonNumber)
+        );
+
+        importanceContent.innerHTML = `
+            <div class="importance-section">
+                <h3>Season ${selectedSeasonNumber}</h3>
+                <div class="importance-grid">
+                    <div>
+                        <h4>Episode Appearances (Season ${selectedSeasonNumber})</h4>
+                        <div id="seasonEpisodesChart"></div>
+                    </div>
+                    <div>
+                        <h4>Word Count (Season ${selectedSeasonNumber})</h4>
+                        <div id="seasonWordsChart"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        renderImportanceBars(
+            document.getElementById("seasonEpisodesChart"),
+            seasonStats,
+            "episodes",
+            "episodes"
+        );
+        renderImportanceBars(
+            document.getElementById("seasonWordsChart"),
+            seasonStats,
+            "words",
+            "words"
+        );
+    }
 }
 
 
