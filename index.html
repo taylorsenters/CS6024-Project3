@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Big Bang Theory Dashboard</title>
+
+    <!-- link css -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- load d3 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+
+    <main class="page-shell">
+        <!-- title -->
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">TV Series Dashboard</p>
+                <h1>The Big Bang Theory Dashboard</h1>
+                <p class="hero-text">
+                    Explore the show theme, the core cast, and episode-level character usage.
+                </p>
+                <!-- overview section -->
+                <div id="overview"></div>
+            </div>
+        </section>
+
+        <!-- character gallery -->
+        <section id="characterGallery"></section>
+
+        <!-- character charts -->
+        <div id="characterCharts"></div>
+
+        <!-- episode charts -->
+        <div id="episodeCharts"></div>
+    </main>
+
+    <!-- load script -->
+    <script src="js/main.js"></script>
+
+</body>
+</html>
