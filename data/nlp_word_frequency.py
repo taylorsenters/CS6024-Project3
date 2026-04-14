@@ -36,6 +36,9 @@ STOP_WORDS = {
 
 def tokenize(text):
     text = str(text).lower()
+    # Remove all apostrophe variants (CSV uses U+2019 curly apostrophes) so
+    # "don't" → "dont" rather than "don" + "t" after the next substitution.
+    text = re.sub(r"['\u2018\u2019\u02bc]", "", text)
     text = re.sub(r"[^a-z\s]", " ", text)
     words = text.split()
     return [w for w in words if w not in STOP_WORDS and len(w) > 2]

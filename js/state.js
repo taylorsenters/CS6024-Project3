@@ -2,8 +2,8 @@
 let globalState = {
     data: [],
     selectedCharacter: null,
-    selectedSeason: null,
-    selectedEpisodeKey: null
+    selectedSeason: "overall",   // shared by both character importance and episode details
+    selectedEpisodeKeys: new Set()
 };
 
 const THEME_SONG_FIRST_LOAD_KEY = "tbbtThemeSongFirstLoadDone";

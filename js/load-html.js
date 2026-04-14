@@ -6,7 +6,9 @@ async function loadVisualizationMarkup() {
         "html/overview.html": "<div id=\"overview\"></div>",
         "html/character-gallery.html": "<section id=\"characterGallery\"></section>",
         "html/character-importance.html": "<div id=\"characterCharts\"></div>",
-        "html/episode-details.html": "<div id=\"episodeCharts\"></div>"
+        "html/episode-details.html": "<div id=\"episodeCharts\"></div>",
+        "html/analysis.html": "<div class=\"analysis-row\"><div id=\"wordCloudSection\"></div><div id=\"networkSection\"></div></div>",
+        "html/locations.html": "<div id=\"locationsSection\"></div>"
     };
 
     for (let slot of slots) {

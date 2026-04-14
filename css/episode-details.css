@@ -1,60 +1,134 @@
-.bar {
-    margin: 5px;
-    padding: 5px;
-    background-color: orange;
-}
+/* ── Episode Details Layout ───────────────────────────────────────── */
 
-.bar:hover {
-    opacity: 0.7;
-    cursor: pointer;
-}
-
-.episode-selected {
-    outline: 2px solid rgba(255, 214, 102, 0.9);
-}
-
-.episode-details-layout {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 16px;
-    align-items: start;
-}
-
-.word-cloud-panel {
+.episode-bars-panel {
     background: rgba(8, 19, 31, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    padding: 10px 12px;
-}
-
-.word-cloud-panel h3 {
-    margin: 0 0 10px;
-    font-size: 1rem;
+    padding: 10px 12px 6px;
+    overflow: hidden;
 }
 
 .word-cloud-content {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 10px;
+    gap: 7px 12px;
     align-items: center;
     align-content: flex-start;
-    min-height: 220px;
+    min-height: 120px;
 }
 
 .word-chip {
     display: inline-block;
-    line-height: 1;
-    color: #f8fcff;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    line-height: 1.1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.15s ease;
+}
+
+.word-chip:hover {
+    opacity: 0.75;
 }
 
 .word-cloud-placeholder {
     margin: 0;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.9rem;
 }
 
-@media (max-width: 900px) {
-    .episode-details-layout {
-        grid-template-columns: 1fr;
-    }
+.ep-grid line {
+    pointer-events: none;
 }
+
+/* ── Recurring Phrases ──────────────────────────────────────────── */
+
+.phrase-section {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.phrase-heading {
+    margin: 0 0 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.phrase-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.phrase-item {
+    display: grid;
+    grid-template-columns: 1fr 60px 32px;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.15s;
+}
+
+.phrase-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.phrase-text {
+    font-size: 0.83rem;
+    color: rgba(255, 255, 255, 0.82);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.phrase-bar-wrap {
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.phrase-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ffd766, #ff9f40);
+}
+
+.phrase-count {
+    font-size: 0.75rem;
+    color: rgba(255, 214, 102, 0.8);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* ── Shared subtitle / placeholder styles ───────────────────────── */
+
+.panel-subtitle {
+    margin: -4px 0 10px;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.l3-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem;
+    text-align: center;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+
+.l3-placeholder-icon {
+    font-size: 2rem;
+    opacity: 0.4;
+}
+
