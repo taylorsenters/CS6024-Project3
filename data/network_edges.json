@@ -294,17 +294,17 @@
     "weight": 290
   },
   {
-    "source": "Beverley",
-    "target": "Sheldon",
-    "scene_weight": 206,
-    "exchange_weight": 80,
-    "weight": 286
-  },
-  {
     "source": "(off)",
     "target": "Leonard",
     "scene_weight": 242,
     "exchange_weight": 44,
+    "weight": 286
+  },
+  {
+    "source": "Beverley",
+    "target": "Sheldon",
+    "scene_weight": 206,
+    "exchange_weight": 80,
     "weight": 286
   },
   {
@@ -413,17 +413,17 @@
     "weight": 173
   },
   {
-    "source": "Arthur",
-    "target": "Leonard",
-    "scene_weight": 122,
-    "exchange_weight": 48,
-    "weight": 170
-  },
-  {
     "source": "Emily",
     "target": "Howard",
     "scene_weight": 137,
     "exchange_weight": 33,
+    "weight": 170
+  },
+  {
+    "source": "Arthur",
+    "target": "Leonard",
+    "scene_weight": 122,
+    "exchange_weight": 48,
     "weight": 170
   },
   {
@@ -518,17 +518,17 @@
     "weight": 98
   },
   {
-    "source": "Koothrappali",
-    "target": "Leonard",
-    "scene_weight": 79,
-    "exchange_weight": 16,
-    "weight": 95
-  },
-  {
     "source": "Howard",
     "target": "Man",
     "scene_weight": 78,
     "exchange_weight": 17,
+    "weight": 95
+  },
+  {
+    "source": "Koothrappali",
+    "target": "Leonard",
+    "scene_weight": 79,
+    "exchange_weight": 16,
     "weight": 95
   },
   {
@@ -567,13 +567,6 @@
     "weight": 74
   },
   {
-    "source": "Man",
-    "target": "Raj",
-    "scene_weight": 57,
-    "exchange_weight": 16,
-    "weight": 73
-  },
-  {
     "source": "Howard",
     "target": "Wil",
     "scene_weight": 66,
@@ -585,6 +578,13 @@
     "target": "Kripke",
     "scene_weight": 67,
     "exchange_weight": 6,
+    "weight": 73
+  },
+  {
+    "source": "Man",
+    "target": "Raj",
+    "scene_weight": 57,
+    "exchange_weight": 16,
     "weight": 73
   },
   {
@@ -644,17 +644,17 @@
     "weight": 46
   },
   {
-    "source": "Emily",
-    "target": "Stuart",
-    "scene_weight": 38,
-    "exchange_weight": 4,
-    "weight": 42
-  },
-  {
     "source": "Stuart",
     "target": "Zack",
     "scene_weight": 31,
     "exchange_weight": 11,
+    "weight": 42
+  },
+  {
+    "source": "Emily",
+    "target": "Stuart",
+    "scene_weight": 38,
+    "exchange_weight": 4,
     "weight": 42
   },
   {
@@ -680,7 +680,7 @@
   },
   {
     "source": "Bernadette",
-    "target": "Man",
+    "target": "Zack",
     "scene_weight": 32,
     "exchange_weight": 2,
     "weight": 34
@@ -694,7 +694,7 @@
   },
   {
     "source": "Bernadette",
-    "target": "Zack",
+    "target": "Man",
     "scene_weight": 32,
     "exchange_weight": 2,
     "weight": 34
@@ -771,16 +771,16 @@
   },
   {
     "source": "Bernadette",
-    "target": "Wil",
-    "scene_weight": 18,
-    "exchange_weight": 1,
+    "target": "Beverley",
+    "scene_weight": 16,
+    "exchange_weight": 3,
     "weight": 19
   },
   {
     "source": "Bernadette",
-    "target": "Beverley",
-    "scene_weight": 16,
-    "exchange_weight": 3,
+    "target": "Wil",
+    "scene_weight": 18,
+    "exchange_weight": 1,
     "weight": 19
   },
   {
@@ -805,13 +805,6 @@
     "weight": 13
   },
   {
-    "source": "Bernadette",
-    "target": "Kripke",
-    "scene_weight": 8,
-    "exchange_weight": 0,
-    "weight": 8
-  },
-  {
     "source": "Cooper",
     "target": "Stuart",
     "scene_weight": 8,
@@ -819,17 +812,24 @@
     "weight": 8
   },
   {
-    "source": "Man",
-    "target": "Wil",
-    "scene_weight": 5,
-    "exchange_weight": 2,
-    "weight": 7
+    "source": "Bernadette",
+    "target": "Kripke",
+    "scene_weight": 8,
+    "exchange_weight": 0,
+    "weight": 8
   },
   {
     "source": "(off)",
     "target": "Zack",
     "scene_weight": 6,
     "exchange_weight": 1,
+    "weight": 7
+  },
+  {
+    "source": "Man",
+    "target": "Wil",
+    "scene_weight": 5,
+    "exchange_weight": 2,
     "weight": 7
   },
   {
@@ -855,31 +855,17 @@
   },
   {
     "source": "Bernadette",
-    "target": "Leslie",
-    "scene_weight": 4,
-    "exchange_weight": 1,
-    "weight": 5
-  },
-  {
-    "source": "Bernadette",
     "target": "Koothrappali",
     "scene_weight": 5,
     "exchange_weight": 0,
     "weight": 5
   },
   {
-    "source": "Man",
-    "target": "Zack",
-    "scene_weight": 3,
-    "exchange_weight": 0,
-    "weight": 3
-  },
-  {
-    "source": "(off)",
+    "source": "Bernadette",
     "target": "Leslie",
-    "scene_weight": 3,
-    "exchange_weight": 0,
-    "weight": 3
+    "scene_weight": 4,
+    "exchange_weight": 1,
+    "weight": 5
   },
   {
     "source": "(off)",
@@ -889,8 +875,8 @@
     "weight": 3
   },
   {
-    "source": "Arthur",
-    "target": "Wil",
+    "source": "Man",
+    "target": "Stuart",
     "scene_weight": 3,
     "exchange_weight": 0,
     "weight": 3
@@ -903,15 +889,29 @@
     "weight": 3
   },
   {
-    "source": "Beverley",
-    "target": "Wil",
+    "source": "(off)",
+    "target": "Leslie",
     "scene_weight": 3,
     "exchange_weight": 0,
     "weight": 3
   },
   {
     "source": "Man",
-    "target": "Stuart",
+    "target": "Zack",
+    "scene_weight": 3,
+    "exchange_weight": 0,
+    "weight": 3
+  },
+  {
+    "source": "Arthur",
+    "target": "Wil",
+    "scene_weight": 3,
+    "exchange_weight": 0,
+    "weight": 3
+  },
+  {
+    "source": "Beverley",
+    "target": "Wil",
     "scene_weight": 3,
     "exchange_weight": 0,
     "weight": 3
@@ -931,14 +931,14 @@
     "weight": 2
   },
   {
-    "source": "Amy",
+    "source": "Beverley",
     "target": "Leslie",
     "scene_weight": 1,
     "exchange_weight": 0,
     "weight": 1
   },
   {
-    "source": "Beverley",
+    "source": "Amy",
     "target": "Leslie",
     "scene_weight": 1,
     "exchange_weight": 0,
