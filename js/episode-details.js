@@ -252,17 +252,17 @@ function renderWordCloudSection() {
 }
 
 function renderNetworkSection() {
+    if (typeof renderCharacterNetworkSection === "function") {
+        renderCharacterNetworkSection();
+        return;
+    }
 
     let div = document.getElementById("networkSection");
     if (!div) return;
 
     div.innerHTML = `
         <h2>Character Network</h2>
-        <p class="panel-subtitle">Who speaks with whom?</p>
-        <div class="l3-placeholder">
-            <div class="l3-placeholder-icon">⬡</div>
-            <div>Network chart coming soon</div>
-        </div>
+        <p class="panel-subtitle">Network component not loaded.</p>
     `;
 }
 
