@@ -6,11 +6,28 @@ function renderCharacterNetworkSection() {
     let isOverall = globalState.selectedSeason === "overall";
     let viewLabel = isOverall ? "All seasons" : `Season ${globalState.selectedSeason}`;
 
+    let clearBtn = globalState.selectedCharacter
+        ? `<button class="clear-btn" id="networkClearBtn">✕ Clear character</button>`
+        : "";
+
     div.innerHTML = `
-        <h2>Character Network</h2>
-        <p class="panel-subtitle">Adjacency matrix view: ${viewLabel}</p>
+        <div class="section-header-row">
+            <h2 style="margin:0">Character Network</h2>
+            ${clearBtn}
+        </div>
+        <p class="panel-subtitle">Adjacency matrix view: ${viewLabel} — click a node to filter the page</p>
         <div id="characterNetworkChart" class="network-chart-wrap"></div>
     `;
+
+    if (globalState.selectedCharacter) {
+        document.getElementById("networkClearBtn").onclick = () => {
+            globalState.selectedCharacter = null;
+            globalState.selectedEpisodeKeys = new Set();
+            document.querySelectorAll(".character-card").forEach(c => c.classList.remove("selected"));
+            renderCharacterCharts();
+            renderEpisodeCharts();
+        };
+    }
 
     let networkData = buildCharacterAdjacencyNetwork(globalState.data, globalState.selectedSeason);
     renderCharacterNetworkGraph(document.getElementById("characterNetworkChart"), networkData);
@@ -90,7 +107,7 @@ function renderCharacterNetworkGraph(container, networkData) {
     }
 
     let width = Math.max(container.getBoundingClientRect().width || 360, 360);
-    let height = 340;
+    let height = Math.max(container.getBoundingClientRect().height || 500, 500);
     let maxWeight = d3.max(networkData.links, d => d.weight) || 1;
     let minWeight = d3.min(networkData.links, d => d.weight) || 1;
 
@@ -118,17 +135,27 @@ function renderCharacterNetworkGraph(container, networkData) {
     let gNodes = svg.append("g");
     let gLabels = svg.append("g");
 
+    let linkDistance = Math.min(width, height) * 0.28;
+
     let simulation = d3.forceSimulation(networkData.nodes)
-        .force("link", d3.forceLink(networkData.links).id(d => d.id).distance(120).strength(0.24))
-        .force("charge", d3.forceManyBody().strength(-350))
+        .force("link", d3.forceLink(networkData.links).id(d => d.id).distance(linkDistance).strength(0.18))
+        .force("charge", d3.forceManyBody().strength(-600))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collide", d3.forceCollide().radius(d => nodeRadius(degreeCount.get(d.id) || 1) + 4));
+        .force("x", d3.forceX(width / 2).strength(0.04))
+        .force("y", d3.forceY(height / 2).strength(0.04))
+        .force("collide", d3.forceCollide().radius(d => nodeRadius(degreeCount.get(d.id) || 1) + 12));
+
+    let selected = globalState.selectedCharacter;
 
     let links = gLinks.selectAll("line")
         .data(networkData.links)
         .join("line")
         .attr("stroke", "rgba(255, 214, 102, 0.55)")
-        .attr("stroke-width", d => linkWidth(d.weight));
+        .attr("stroke-width", d => linkWidth(d.weight))
+        .attr("opacity", d => {
+            if (!selected) return 1;
+            return getNodeId(d.source) === selected || getNodeId(d.target) === selected ? 1 : 0.1;
+        });
 
     links.append("title")
         .text(d => `${getNodeId(d.source)} ↔ ${getNodeId(d.target)}: ${d.weight} shared scenes`);
@@ -142,11 +169,16 @@ function renderCharacterNetworkGraph(container, networkData) {
         .attr("font-weight", "700")
         .attr("text-anchor", "middle")
         .attr("dy", "-0.45em")
+        .attr("opacity", d => {
+            if (!selected) return 1;
+            return getNodeId(d.source) === selected || getNodeId(d.target) === selected ? 1 : 0.1;
+        })
         .style("pointer-events", "none");
 
     let nodeGroups = gNodes.selectAll("g")
         .data(networkData.nodes)
         .join("g")
+        .style("cursor", "pointer")
         .call(
             d3.drag()
                 .on("start", dragStarted)
@@ -161,6 +193,19 @@ function renderCharacterNetworkGraph(container, networkData) {
             });
             renderCharacterCharts();
             renderEpisodeCharts();
+        })
+        .on("mouseenter", function (_, d) {
+            // Brighten the ring on hover (unless already selected — keep gold)
+            d3.select(this).select("circle.node-ring")
+                .attr("stroke", "#ffd766")
+                .attr("stroke-width", d.id === globalState.selectedCharacter ? 3 : 2.5)
+                .attr("stroke-opacity", d.id === globalState.selectedCharacter ? 1 : 0.65);
+        })
+        .on("mouseleave", function (_, d) {
+            d3.select(this).select("circle.node-ring")
+                .attr("stroke", d.id === globalState.selectedCharacter ? "#ffd766" : "rgba(8, 19, 31, 0.92)")
+                .attr("stroke-width", d.id === globalState.selectedCharacter ? 3 : 2)
+                .attr("stroke-opacity", 1);
         });
 
     nodeGroups.each(function (d) {
@@ -184,15 +229,19 @@ function renderCharacterNetworkGraph(container, networkData) {
             .attr("preserveAspectRatio", "xMidYMid slice")
             .attr("clip-path", `url(#${clipId})`);
 
+        // Named class so mouseenter/mouseleave can select it
         group.append("circle")
+            .attr("class", "node-ring")
             .attr("r", radius)
             .attr("fill", "none")
             .attr("stroke", d.id === globalState.selectedCharacter ? "#ffd766" : "rgba(8, 19, 31, 0.92)")
             .attr("stroke-width", d.id === globalState.selectedCharacter ? 3 : 2);
+
+        group.attr("opacity", selected && d.id !== selected ? 0.25 : 1);
     });
 
     nodeGroups.append("title")
-        .text(d => `${d.id}: ${(degreeCount.get(d.id) || 0)} interaction weight`);
+        .text(d => `${d.id} — click to filter\n${(degreeCount.get(d.id) || 0)} shared scenes total`);
 
     let labels = gLabels.selectAll("text")
         .data(networkData.nodes)
@@ -206,6 +255,7 @@ function renderCharacterNetworkGraph(container, networkData) {
         .attr("stroke", "rgba(7, 18, 29, 0.96)")
         .attr("stroke-width", 3.5)
         .attr("paint-order", "stroke")
+        .attr("opacity", d => selected && d.id !== selected ? 0.25 : 1)
         .style("letter-spacing", "0.02em")
         .style("pointer-events", "none");
 
