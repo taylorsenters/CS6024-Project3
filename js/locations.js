@@ -39,6 +39,7 @@ function renderLocationsSection() {
             <select id="locationsSeasonSelect"></select>
         </div>
         <div id="locationsChart"></div>
+        <div id="dialogueTimelinePanel"></div>
     `;
 
     // Season dropdown — shares globalState.selectedSeason with other sections
@@ -124,6 +125,7 @@ function renderLocationsSection() {
     });
 
     renderHeatmap(chartDiv, matrix, topLocs, characters, globalMax);
+    renderDialogueTimeline(document.getElementById("dialogueTimelinePanel"));
 }
 
 
