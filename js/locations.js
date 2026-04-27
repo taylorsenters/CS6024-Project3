@@ -132,15 +132,31 @@ function renderLocationsSection() {
 function renderHeatmap(container, matrix, locations, characters, globalMax) {
 
     container.innerHTML = "";
+    container.style.position = "relative";
 
     // Fill available container width
     const containerW = (container.getBoundingClientRect().width || 860);
-    const margin  = { top: 56, right: 16, bottom: 16, left: Math.min(196, Math.max(120, containerW * 0.28)) };
-    const rowH    = containerW < 500 ? 26 : 34;
+    const margin  = { top: 62, right: 16, bottom: 16, left: Math.min(240, Math.max(170, containerW * 0.34)) };
+    const rowH    = containerW < 500 ? 44 : 56;
     const innerH  = locations.length * rowH;
     const innerW  = containerW - margin.left - margin.right;
     const colW    = innerW / characters.length;
     const totalH  = innerH + margin.top + margin.bottom;
+
+    const tooltip = d3.select(container)
+        .append("div")
+        .style("position", "absolute")
+        .style("pointer-events", "none")
+        .style("padding", "8px 10px")
+        .style("font-size", "11px")
+        .style("line-height", "1.35")
+        .style("color", "#fff")
+        .style("background", "rgba(8, 19, 31, 0.96)")
+        .style("border", "1px solid rgba(255,255,255,0.24)")
+        .style("border-radius", "10px")
+        .style("box-shadow", "0 8px 22px rgba(0,0,0,0.3)")
+        .style("max-width", "250px")
+        .style("opacity", 0);
 
     const svg = d3.create("svg")
         .attr("width", containerW)
@@ -186,12 +202,12 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         .join("text")
         .attr("class", "char-label")
         .attr("x", d => x(d) + x.bandwidth() / 2)
-        .attr("y", -10)
+        .attr("y", -12)
         .attr("text-anchor", "middle")
         .style("fill", d => d === globalState.selectedCharacter
             ? "#ffd766"
             : "rgba(255,255,255,0.72)")
-        .style("font-size", containerW < 500 ? "9px" : "12px")
+        .style("font-size", containerW < 500 ? "10px" : "14px")
         .style("font-weight", d => d === globalState.selectedCharacter ? "700" : "400")
         .style("cursor", "pointer")
         .style("text-decoration", d => d === globalState.selectedCharacter ? "underline" : "none")
@@ -213,12 +229,33 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         .join("text")
         .attr("class", "loc-label")
         .attr("x", -10)
-        .attr("y", d => y(d) + y.bandwidth() / 2)
+        .attr("y", d => y(d) + 14)
         .attr("text-anchor", "end")
-        .attr("dominant-baseline", "middle")
-        .style("fill", "rgba(255,255,255,0.68)")
-        .style("font-size", containerW < 500 ? "9px" : "11px")
+        .attr("dominant-baseline", "hanging")
+        .style("fill", "rgba(255,255,255,0.86)")
+        .style("font-size", containerW < 500 ? "10px" : "12px")
+        .style("font-weight", "600")
         .text(d => formatLocation(d));
+
+    // Location images below labels (if available)
+    g.selectAll(".loc-thumb")
+        .data(locations)
+        .join("image")
+        .attr("class", "loc-thumb")
+        .attr("href", d => getLocationImagePath(d) || "")
+        .attr("x", -48)
+        .attr("y", d => y(d) + 28)
+        .attr("width", 36)
+        .attr("height", 22)
+        .attr("rx", 4)
+        .attr("opacity", d => getLocationImagePath(d) ? 0.96 : 0)
+        .attr("preserveAspectRatio", "xMidYMid slice")
+        .style("cursor", d => getLocationImagePath(d) ? "pointer" : "default")
+        .on("click", (_, d) => {
+            let locationImagePath = getLocationImagePath(d);
+            if (!locationImagePath) return;
+            showLocationImagePopup(locationImagePath, formatLocation(d));
+        });
 
     // ── Cells ──────────────────────────────────────────────────────────────
     const selected = globalState.selectedCharacter;
@@ -239,12 +276,33 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
             if (!selected) return 1;
             return d.chr === selected ? 1 : 0.28;
         })
-        .style("cursor", "default")
-        .each(function(d) {
-            if (d.count > 0) {
-                d3.select(this).append("title")
-                    .text(`${d.chr} @ ${formatLocation(d.loc)}\n${d.count.toLocaleString()} lines`);
-            }
+        .style("cursor", d => d.count > 0 ? "pointer" : "default")
+        .on("mouseenter", function (event, d) {
+            if (d.count <= 0) return;
+            d3.select(this).attr("stroke", "rgba(255,255,255,0.72)").attr("stroke-width", 1.2);
+            let characterImg = getCharacterImagePath(d.chr);
+            let locationImg = getLocationImagePath(d.loc);
+            tooltip.style("opacity", 1).html(`
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    ${characterImg ? `<img src="${characterImg}" alt="${d.chr}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;border:1px solid rgba(255,255,255,0.25)">` : ""}
+                    <div>
+                        <div style="font-weight:700">${d.chr}</div>
+                        <div style="opacity:0.88">${formatLocation(d.loc)}</div>
+                        <div style="margin-top:2px">Dialogues: <strong>${d.count.toLocaleString()}</strong></div>
+                    </div>
+                </div>
+                ${locationImg ? `<div style="margin-top:8px"><img src="${locationImg}" alt="${formatLocation(d.loc)}" style="width:100%;max-width:220px;height:74px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.2)"></div>` : ""}
+            `);
+        })
+        .on("mousemove", function (event) {
+            let [mx, my] = d3.pointer(event, container);
+            tooltip
+                .style("left", `${mx + 12}px`)
+                .style("top", `${my + 12}px`);
+        })
+        .on("mouseleave", function () {
+            d3.select(this).attr("stroke", "none");
+            tooltip.style("opacity", 0);
         });
 
     // ── Line count labels inside cells ──────────────
@@ -257,7 +315,8 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
             .attr("y", d => y(d.loc) + y.bandwidth() / 2)
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
-            .style("font-size", "9px")
+            .style("font-size", containerW < 500 ? "11px" : "13px")
+            .style("font-weight", "700")
             .style("pointer-events", "none")
             .style("fill", d => d.count / globalMax > 0.55
                 ? "rgba(10,20,34,0.9)"   // dark text on bright yellow cells
@@ -318,4 +377,107 @@ function formatLocation(loc) {
         .split(" ")
         .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
         .join(" ");
+}
+
+function getCharacterImagePath(characterName) {
+    let card = characterCards.find(item => item.name === characterName);
+    return card ? card.image : null;
+}
+
+function getLocationImagePath(locationName) {
+    const IMAGE_BY_LOCATION = {
+        "sheldon & leonard's apartment": "images/Sheldon & Leonard's Apartment.webp",
+        "penny's apartment": "images/Penny's Apartment.webp",
+        "caltech cafeteria": "images/Caltech Cafeteria.webp",
+        "cheesecake factory": "images/Cheesecake Factory.jpeg",
+        "stairwell": "images/Stairwell.webp",
+        "howard's house": "images/Howard's House.webp",
+        "comic book store": "images/Comic Book Store.jpg",
+        "university office": "images/University Office.jpg"
+    };
+
+    let key = String(locationName || "")
+        .toLowerCase()
+        .replace(/[\u2018\u2019\u02BC]/g, "'")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    if (IMAGE_BY_LOCATION[key]) return IMAGE_BY_LOCATION[key];
+
+    // Loose match for variant forms like "the caltech cafeteria", "penny apartment"
+    if (key.includes("caltech") && key.includes("cafeteria")) return IMAGE_BY_LOCATION["caltech cafeteria"];
+    if (key.includes("cheesecake")) return IMAGE_BY_LOCATION["cheesecake factory"];
+    if (key.includes("stairwell")) return IMAGE_BY_LOCATION["stairwell"];
+    if (key.includes("comic") && key.includes("store")) return IMAGE_BY_LOCATION["comic book store"];
+    if (key.includes("university") && key.includes("office")) return IMAGE_BY_LOCATION["university office"];
+    if (key.includes("howard") && key.includes("house")) return IMAGE_BY_LOCATION["howard's house"];
+    if (key.includes("penny") && key.includes("apartment")) return IMAGE_BY_LOCATION["penny's apartment"];
+    if (key.includes("sheldon") && key.includes("leonard") && key.includes("apartment")) return IMAGE_BY_LOCATION["sheldon & leonard's apartment"];
+
+    return null;
+}
+
+function showLocationImagePopup(imagePath, locationTitle) {
+    const existing = document.getElementById("locationImagePopupOverlay");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "locationImagePopupOverlay";
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.background = "rgba(0,0,0,0.72)";
+    overlay.style.zIndex = "9999";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.padding = "20px";
+
+    const popup = document.createElement("div");
+    popup.style.position = "relative";
+    popup.style.maxWidth = "760px";
+    popup.style.width = "100%";
+    popup.style.background = "rgba(8, 19, 31, 0.98)";
+    popup.style.border = "1px solid rgba(255,255,255,0.2)";
+    popup.style.borderRadius = "12px";
+    popup.style.padding = "14px 14px 12px";
+    popup.style.boxShadow = "0 18px 42px rgba(0,0,0,0.42)";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.textContent = "✕ Close";
+    closeBtn.style.position = "absolute";
+    closeBtn.style.top = "10px";
+    closeBtn.style.right = "10px";
+    closeBtn.style.border = "1px solid rgba(255,255,255,0.28)";
+    closeBtn.style.background = "rgba(7,18,29,0.8)";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.padding = "4px 10px";
+    closeBtn.style.borderRadius = "8px";
+    closeBtn.style.cursor = "pointer";
+
+    const title = document.createElement("h4");
+    title.textContent = locationTitle;
+    title.style.margin = "0 0 10px";
+    title.style.color = "#ffd766";
+    title.style.fontSize = "1rem";
+
+    const image = document.createElement("img");
+    image.src = imagePath;
+    image.alt = locationTitle;
+    image.style.width = "100%";
+    image.style.maxHeight = "72vh";
+    image.style.objectFit = "cover";
+    image.style.borderRadius = "10px";
+    image.style.border = "1px solid rgba(255,255,255,0.18)";
+
+    closeBtn.onclick = () => overlay.remove();
+    overlay.onclick = (e) => {
+        if (e.target === overlay) overlay.remove();
+    };
+
+    popup.appendChild(closeBtn);
+    popup.appendChild(title);
+    popup.appendChild(image);
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
 }
