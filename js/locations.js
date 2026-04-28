@@ -150,7 +150,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         .style("position", "absolute")
         .style("pointer-events", "none")
         .style("padding", "8px 10px")
-        .style("font-size", "11px")
+        .style("font-size", "14px")
         .style("line-height", "1.35")
         .style("color", "#fff")
         .style("background", "rgba(8, 19, 31, 0.96)")
@@ -235,7 +235,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         .attr("text-anchor", "end")
         .attr("dominant-baseline", "hanging")
         .style("fill", "rgba(255,255,255,0.86)")
-        .style("font-size", containerW < 500 ? "10px" : "12px")
+        .style("font-size", containerW < 500 ? "12px" : "14px")
         .style("font-weight", "600")
         .text(d => formatLocation(d));
 
@@ -317,7 +317,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
             .attr("y", d => y(d.loc) + y.bandwidth() / 2)
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
-            .style("font-size", containerW < 500 ? "11px" : "13px")
+            .style("font-size", containerW < 500 ? "14px" : "16px")
             .style("font-weight", "700")
             .style("pointer-events", "none")
             .style("fill", d => d.count / globalMax > 0.55
@@ -345,12 +345,12 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         .attr("fill", "url(#hmLegend)");
     lg.append("text")
         .attr("y", legendH + 12).attr("x", 0)
-        .style("fill", "rgba(255,255,255,0.45)").style("font-size", "9px")
+        .style("fill", "rgba(255,255,255,0.45)").style("font-size", "14px")
         .text("fewer lines");
     lg.append("text")
         .attr("y", legendH + 12).attr("x", legendW)
         .attr("text-anchor", "end")
-        .style("fill", "rgba(255,255,255,0.45)").style("font-size", "9px")
+        .style("fill", "rgba(255,255,255,0.45)").style("font-size", "14px")
         .text("more lines");
 
     container.appendChild(svg.node());
