@@ -127,7 +127,6 @@ function renderImportanceBars(container, stats, metricKey, metricLabel) {
 
             renderCharacterCharts();
             renderEpisodeCharts();
-            document.getElementById("episodeCharts").scrollIntoView({ behavior: "smooth" });
         };
 
         let widthPercent = (stat[metricKey] / maxValue) * 100;

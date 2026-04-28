@@ -134,7 +134,7 @@
 
 .network-chart-wrap {
     margin-top: 6px;
-    min-height: 520px;
+    height: 520px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     background: rgba(8, 19, 31, 0.5);
@@ -143,4 +143,39 @@
 
 .network-chart-wrap svg {
     display: block;
+}
+
+/* ── Character Network: inner two-panel split ──────────────────────────── */
+
+.network-inner-row {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.network-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.chord-chart-wrap {
+    height: 520px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    background: rgba(8, 19, 31, 0.5);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.chord-chart-wrap svg {
+    display: block;
+}
+
+@media (max-width: 700px) {
+    .network-inner-row {
+        flex-direction: column;
+    }
 }
