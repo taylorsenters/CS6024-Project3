@@ -34,7 +34,11 @@ function renderCharacterGallery() {
             let alreadySelected = globalState.selectedCharacter === character.name;
 
             // Toggle: clicking the selected character clears the filter
-            globalState.selectedCharacter = alreadySelected ? null : character.name;
+            if (alreadySelected) {
+                selectAllCharacters();
+            } else {
+                globalState.selectedCharacter = character.name;
+            }
             globalState.selectedEpisodeKeys = new Set();
 
             // Update selected ring on all cards without a full re-render
@@ -45,7 +49,7 @@ function renderCharacterGallery() {
             renderCharacterCharts();
             renderEpisodeCharts();
 
-            if (globalState.selectedCharacter) {
+            if (typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter) {
                 document.getElementById("characterCharts").scrollIntoView({ behavior: "smooth" });
             }
         });

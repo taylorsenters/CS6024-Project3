@@ -1,7 +1,7 @@
 // shared app state and data helpers
 let globalState = {
     data: [],
-    selectedCharacter: null,
+    selectedCharacter: [],
     selectedSeason: "overall",   // shared by both character importance and episode details
     selectedEpisodeKeys: new Set()
 };
@@ -16,6 +16,22 @@ const MAIN_CHARACTERS = new Set([
     "Bernadette",
     "Amy"
 ]);
+
+function getAllCharacterNames() {
+    return [...MAIN_CHARACTERS];
+}
+
+function isAllCharactersSelected() {
+    return Array.isArray(globalState.selectedCharacter) &&
+        globalState.selectedCharacter.length === MAIN_CHARACTERS.size &&
+        globalState.selectedCharacter.every(character => MAIN_CHARACTERS.has(character));
+}
+
+function selectAllCharacters() {
+    globalState.selectedCharacter = getAllCharacterNames();
+}
+
+selectAllCharacters();
 
 let characterCards = [
     {

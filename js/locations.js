@@ -19,7 +19,8 @@ function renderLocationsSection() {
         cleanCharacterRows(globalState.data).map(d => d.Season)
     )).sort((a, b) => a - b);
 
-    const clearBtn = globalState.selectedCharacter
+    const hasSelectedCharacter = typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter;
+    const clearBtn = hasSelectedCharacter
         ? `<button class="clear-btn" id="locationsClearBtn">✕ Clear character</button>`
         : "";
 
@@ -30,7 +31,7 @@ function renderLocationsSection() {
         </div>
         <p class="chart-note">
             Top ${TOP_LOCATIONS} locations by dialogue lines — ${scopeLabel}.
-            ${globalState.selectedCharacter
+            ${hasSelectedCharacter
                 ? `Highlighting <strong>${globalState.selectedCharacter}</strong>.`
                 : "Select a character above to highlight their column."}
         </p>
@@ -50,6 +51,7 @@ function renderLocationsSection() {
     seasonSelect.value = String(globalState.selectedSeason);
     seasonSelect.onchange = (e) => {
         globalState.selectedSeason = e.target.value;
+        selectAllCharacters();
         globalState.selectedEpisodeKeys = new Set();
         renderCharacterCharts();
         renderEpisodeCharts();
@@ -59,7 +61,7 @@ function renderLocationsSection() {
     const clearBtnEl = document.getElementById("locationsClearBtn");
     if (clearBtnEl) {
         clearBtnEl.onclick = () => {
-            globalState.selectedCharacter = null;
+            selectAllCharacters();
             globalState.selectedEpisodeKeys = new Set();
             document.querySelectorAll(".character-card").forEach(c => c.classList.remove("selected"));
             renderCharacterCharts();
@@ -258,7 +260,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         });
 
     // ── Cells ──────────────────────────────────────────────────────────────
-    const selected = globalState.selectedCharacter;
+    const selected = typeof globalState.selectedCharacter === "string" ? globalState.selectedCharacter : "";
 
     g.selectAll(".hm-cell")
         .data(matrix)
@@ -358,7 +360,11 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
 // Toggle character selection from the heatmap — syncs gallery, importance, and episode charts
 function selectCharacterFromChart(character) {
     const alreadySelected = globalState.selectedCharacter === character;
-    globalState.selectedCharacter = alreadySelected ? null : character;
+    if (alreadySelected) {
+        selectAllCharacters();
+    } else {
+        globalState.selectedCharacter = character;
+    }
     globalState.selectedEpisodeKeys = new Set();
 
     document.querySelectorAll(".character-card").forEach(c => {

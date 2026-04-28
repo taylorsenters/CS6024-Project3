@@ -3,7 +3,8 @@ function renderCharacterCharts() {
     let div = document.getElementById("characterCharts");
 
     // Header row: title + clear button (only shown when a character is selected)
-    let clearBtn = globalState.selectedCharacter
+    let hasSelectedCharacter = typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter;
+    let clearBtn = hasSelectedCharacter
         ? `<button class="clear-btn" id="clearCharacterBtn">✕ Clear</button>`
         : "";
 
@@ -20,9 +21,9 @@ function renderCharacterCharts() {
         <div id="importanceContent"></div>
     `;
 
-    if (globalState.selectedCharacter) {
+    if (hasSelectedCharacter) {
         document.getElementById("clearCharacterBtn").onclick = () => {
-            globalState.selectedCharacter = null;
+            selectAllCharacters();
             globalState.selectedEpisodeKeys = new Set();
             document.querySelectorAll(".character-card").forEach(c => c.classList.remove("selected"));
             renderCharacterCharts();
@@ -45,6 +46,7 @@ function renderCharacterCharts() {
     seasonSelect.value = String(globalState.selectedSeason);
     seasonSelect.onchange = (e) => {
         globalState.selectedSeason = e.target.value;
+        selectAllCharacters();
         globalState.selectedEpisodeKeys = new Set();
         renderCharacterCharts();
         renderEpisodeCharts();
@@ -109,7 +111,7 @@ function renderImportanceBars(container, stats, metricKey, metricLabel) {
         let row = document.createElement("div");
         row.className = "importance-row";
 
-        if (globalState.selectedCharacter === stat.character) {
+        if (typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter === stat.character) {
             row.classList.add("selected");
         }
 

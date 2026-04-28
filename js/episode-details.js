@@ -4,8 +4,23 @@ function renderEpisodeCharts() {
 
     let div = document.getElementById("episodeCharts");
     div.innerHTML = "<h2>Episode Details</h2>";
+    let selectedCharacter = "";
 
-    if (!globalState.selectedCharacter) {
+    if (typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter) {
+        selectedCharacter = globalState.selectedCharacter;
+    } else if (Array.isArray(globalState.selectedCharacter) && globalState.selectedCharacter.length === 1) {
+        selectedCharacter = globalState.selectedCharacter[0];
+        globalState.selectedCharacter = selectedCharacter;
+    }
+
+    if (globalState.selectedEpisodeKeys.size === 0) {
+        globalState.episodeSelectionManual = false;
+    }
+    if (globalState.episodeSelectionManual !== true && globalState.selectedEpisodeKeys.size > 0) {
+        globalState.selectedEpisodeKeys = new Set();
+    }
+
+    if (!selectedCharacter) {
         div.innerHTML += "<p class='chart-note'>Click a character above to see their episode-level details.</p>";
         renderAnalysisSection();
         renderLocationsSection();
@@ -16,7 +31,7 @@ function renderEpisodeCharts() {
     let header = document.createElement("div");
     header.className = "section-header-row";
     header.innerHTML = `
-        <h3 style="margin:0">Selected: ${globalState.selectedCharacter}</h3>
+        <h3 style="margin:0">Selected: ${selectedCharacter}</h3>
         <button class="clear-btn" id="clearCharacterFromEpisodes">✕ Clear character</button>
     `;
     div.appendChild(header);
@@ -26,7 +41,7 @@ function renderEpisodeCharts() {
     note.textContent = "Click bars to select episodes — the word cloud updates below. Click again to deselect.";
     div.appendChild(note);
 
-    let allCharData = globalState.data.filter(d => d.Character === globalState.selectedCharacter);
+    let allCharData = globalState.data.filter(d => d.Character === selectedCharacter);
     let seasons = Array.from(new Set(allCharData.map(d => d.Season))).sort((a, b) => a - b);
 
     // Season filter + episode clear button
@@ -48,8 +63,9 @@ function renderEpisodeCharts() {
 
     // Wire clear-character button
     document.getElementById("clearCharacterFromEpisodes").onclick = () => {
-        globalState.selectedCharacter = null;
+        selectAllCharacters();
         globalState.selectedEpisodeKeys = new Set();
+        globalState.episodeSelectionManual = false;
         document.querySelectorAll(".character-card").forEach(c => c.classList.remove("selected"));
         renderCharacterCharts();
         renderEpisodeCharts();
@@ -64,6 +80,7 @@ function renderEpisodeCharts() {
     episodeSeasonSelect.onchange = (e) => {
         globalState.selectedSeason = e.target.value;
         globalState.selectedEpisodeKeys = new Set();
+        globalState.episodeSelectionManual = false;
         renderCharacterCharts();
         renderEpisodeCharts();
     };
@@ -93,6 +110,7 @@ function renderEpisodeCharts() {
         clearEpBtn.style.display = "";
         clearEpBtn.onclick = () => {
             globalState.selectedEpisodeKeys = new Set();
+            globalState.episodeSelectionManual = false;
             renderEpisodeCharts();
         };
     }
@@ -214,6 +232,7 @@ function renderEpisodeBars(container, episodeArray) {
             } else {
                 globalState.selectedEpisodeKeys.add(ep);
             }
+            globalState.episodeSelectionManual = globalState.selectedEpisodeKeys.size > 0;
             renderEpisodeCharts();
         });
 
@@ -278,11 +297,18 @@ function renderWordCloud() {
 
     let rows, titleText, subtitleText;
 
-    if (!globalState.selectedCharacter) {
+    let hasSelectedCharacter = typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter;
+
+    if (!hasSelectedCharacter || isAllCharactersSelected()) {
         // No character selected — show all main characters combined
         rows = cleanCharacterRows(globalState.data);
+        if (globalState.selectedSeason !== "overall") {
+            rows = rows.filter(d => d.Season === +globalState.selectedSeason);
+        }
         titleText = "Word Cloud — All Characters";
-        subtitleText = "Combined dialogue across all main characters";
+        subtitleText = globalState.selectedSeason === "overall"
+            ? "Combined dialogue across all main characters"
+            : `Season ${globalState.selectedSeason}`;
 
     } else if (globalState.selectedEpisodeKeys.size === 0) {
         // Character selected, no episodes — show full character overview

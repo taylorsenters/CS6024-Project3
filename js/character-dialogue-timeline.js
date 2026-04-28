@@ -74,9 +74,23 @@ function renderDialogueTimeline(container) {
     const innerH = height - margin.top - margin.bottom;
     const xTickStep = Math.max(1, Math.ceil(stackedRows.length / Math.max(7, Math.floor(width / 90))));
     const characters = [...MAIN_CHARACTERS];
+    let selectedCharacters = [];
+
+    if (Array.isArray(globalState.selectedCharacter)) {
+        selectedCharacters = globalState.selectedCharacter.filter(character => MAIN_CHARACTERS.has(character));
+        if (selectedCharacters.length !== globalState.selectedCharacter.length) {
+            globalState.selectedCharacter = selectedCharacters;
+        }
+    } else if (typeof globalState.selectedCharacter === "string" && MAIN_CHARACTERS.has(globalState.selectedCharacter)) {
+        selectedCharacters = [globalState.selectedCharacter];
+    } else {
+        selectAllCharacters();
+        selectedCharacters = getAllCharacterNames();
+    }
+
     const legendState = characters.map(character => ({
         character,
-        active: true,
+        active: selectedCharacters.length === 0 ? true : selectedCharacters.includes(character),
         total: totalsLookup.get(character) || 0
     }));
 
@@ -281,14 +295,30 @@ function renderDialogueTimeline(container) {
             setAllLegendCharacters(true);
         });
 
-    function getActiveLegendKeys() {
-        return legendState.filter(d => d.active).map(d => d.character);
+    function getFilteredCharacters() {
+        if (typeof globalState.selectedCharacter === "string" && MAIN_CHARACTERS.has(globalState.selectedCharacter)) {
+            return [globalState.selectedCharacter];
+        } else if (!Array.isArray(globalState.selectedCharacter) || isAllCharactersSelected()) {
+            return [...characters];
+        } else {
+            return globalState.selectedCharacter.filter(character => MAIN_CHARACTERS.has(character));
+        }
+    }
+
+    function syncLegendToGlobalState() {
+        let activeKeys = legendState.filter(d => d.active).map(d => d.character);
+        if (activeKeys.length === characters.length) {
+            selectAllCharacters();
+        } else {
+            globalState.selectedCharacter = activeKeys;
+        }
     }
 
     function setAllLegendCharacters(isActive) {
         legendState.forEach(d => {
             d.active = isActive;
         });
+        syncLegendToGlobalState();
         syncLegendAndChart();
     }
 
@@ -298,16 +328,21 @@ function renderDialogueTimeline(container) {
         if (!current) return;
         if (current.active && activeCount === 1) return;
         current.active = !current.active;
+        syncLegendToGlobalState();
         syncLegendAndChart();
     }
 
     function syncLegendAndChart() {
+        let selectedSet = new Set(getFilteredCharacters());
+        legendState.forEach(d => {
+            d.active = selectedSet.has(d.character);
+        });
         renderStackedAreas();
         updateLegendStyles();
     }
 
     function renderStackedAreas() {
-        let activeKeys = getActiveLegendKeys();
+        let activeKeys = getFilteredCharacters();
         let filteredSeries = d3.stack().keys(activeKeys)(stackedRows);
         // Keep Y-axis fixed to the full chart range, even when legends are filtered.
         y.domain([0, maxY]).nice();

@@ -6,7 +6,8 @@ function renderCharacterNetworkSection() {
     let isOverall = globalState.selectedSeason === "overall";
     let viewLabel = isOverall ? "All seasons" : `Season ${globalState.selectedSeason}`;
 
-    let clearBtn = globalState.selectedCharacter
+    let hasSelectedCharacter = typeof globalState.selectedCharacter === "string" && globalState.selectedCharacter;
+    let clearBtn = hasSelectedCharacter
         ? `<button class="clear-btn" id="networkClearBtn">✕ Clear character</button>`
         : "";
 
@@ -19,9 +20,9 @@ function renderCharacterNetworkSection() {
         <div id="characterNetworkChart" class="network-chart-wrap"></div>
     `;
 
-    if (globalState.selectedCharacter) {
+    if (hasSelectedCharacter) {
         document.getElementById("networkClearBtn").onclick = () => {
-            globalState.selectedCharacter = null;
+            selectAllCharacters();
             globalState.selectedEpisodeKeys = new Set();
             document.querySelectorAll(".character-card").forEach(c => c.classList.remove("selected"));
             renderCharacterCharts();
@@ -145,7 +146,7 @@ function renderCharacterNetworkGraph(container, networkData) {
         .force("y", d3.forceY(height / 2).strength(0.04))
         .force("collide", d3.forceCollide().radius(d => nodeRadius(degreeCount.get(d.id) || 1) + 12));
 
-    let selected = globalState.selectedCharacter;
+    let selected = typeof globalState.selectedCharacter === "string" ? globalState.selectedCharacter : "";
 
     let links = gLinks.selectAll("line")
         .data(networkData.links)
