@@ -134,7 +134,7 @@
 
 .network-chart-wrap {
     margin-top: 6px;
-    min-height: 320px;
+    min-height: 520px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     background: rgba(8, 19, 31, 0.5);
@@ -144,4 +144,3 @@
 .network-chart-wrap svg {
     display: block;
 }
-
