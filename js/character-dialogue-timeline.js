@@ -14,7 +14,7 @@ function renderDialogueTimeline(container) {
 
     if (!filteredRows.length) {
         container.innerHTML = `
-            <h3 style="margin:14px 0 6px">Character Dialogue Timeline</h3>
+            <h2 style="margin:14px 0 6px">Character Dialogue Timeline</h2>
             <p class="chart-note">No dialogue timeline data available for the current filter.</p>
         `;
         return;
@@ -60,7 +60,7 @@ function renderDialogueTimeline(container) {
 
     container.innerHTML = `
         <div class="section-header-row" style="margin-top:14px">
-            <h3 style="margin:0">Character Dialogue Timeline</h3>
+            <h2 style="margin:0">Character Dialogue Timeline</h2>
         </div>
         <p class="chart-note">Stacked area chart of dialogue counts across season/episode timeline for all main characters (uses current filters).</p>
         <div id="dialogueTimelineChart" class="episode-bars-panel" style="position:relative"></div>
@@ -68,12 +68,22 @@ function renderDialogueTimeline(container) {
 
     const panel = document.getElementById("dialogueTimelineChart");
     const panelW = panel.getBoundingClientRect().width || 900;
-    const margin = { top: 20, right: 18, bottom: 66, left: 78 };
-    const width = panelW - margin.left - margin.right;
-    const height = 420;
-    const innerH = height - margin.top - margin.bottom;
-    const xTickStep = Math.max(1, Math.ceil(stackedRows.length / Math.max(7, Math.floor(width / 90))));
     const characters = [...MAIN_CHARACTERS];
+
+    // Legend sizing — compute before margin so margin.top can fit the legend
+    const LEGEND_ITEM_W = 185;
+    const fixedLeft = 78, fixedRight = 18, fixedBottom = 66;
+    const chartWidth = panelW - fixedLeft - fixedRight;
+    const legendCols = Math.max(1, Math.min(characters.length, Math.floor(chartWidth / LEGEND_ITEM_W)));
+    const legendItemRows = Math.ceil(characters.length / legendCols);
+    const LEGEND_TOP_PAD = 8;
+    const legendAreaH = (legendItemRows + 1) * 22 + LEGEND_TOP_PAD; // +1 row for Select All
+
+    const margin = { top: legendAreaH, right: fixedRight, bottom: fixedBottom, left: fixedLeft };
+    const width = chartWidth;
+    const innerH = 334; // keep chart area constant regardless of legend size
+    const height = innerH + margin.top + margin.bottom;
+    const xTickStep = Math.max(1, Math.ceil(stackedRows.length / Math.max(7, Math.floor(width / 90))));
     let selectedCharacters = [];
 
     if (Array.isArray(globalState.selectedCharacter)) {
@@ -109,7 +119,7 @@ function renderDialogueTimeline(container) {
 
     let color = d3.scaleOrdinal()
         .domain([...MAIN_CHARACTERS])
-        .range(["#ffd766", "#89c7ff", "#ff9f40", "#7ef0c3", "#c58cff", "#ff7fa1", "#98d7ff"]);
+        .range(["#ffd766", "#89c7ff", "#ff9f40", "#7ef0c3", "#c58cff", "#ff7fa1", "#f97aff"]);
 
     let svg = d3.create("svg")
         .attr("width", panelW)
@@ -196,14 +206,16 @@ function renderDialogueTimeline(container) {
         .style("font-weight", "700")
         .text("No. of dialogues");
 
-    let legend = g.append("g").attr("transform", "translate(0,-8)");
-    let legendItems = legend.selectAll("g")
+    // Legend sits above the chart — positioned so its top starts LEGEND_TOP_PAD px from SVG top
+    let legend = g.append("g").attr("transform", `translate(0,${-(legendAreaH - LEGEND_TOP_PAD)})`);
+    let legendItems = legend.selectAll("g.legend-item")
         .data(legendState, d => d.character)
         .join("g")
+        .attr("class", "legend-item")
         .attr("transform", (d, i) => {
-            let col = i % 4;
-            let row = Math.floor(i / 4);
-            return `translate(${col * 190},${row * 22})`;
+            let col = i % legendCols;
+            let row = Math.floor(i / legendCols);
+            return `translate(${col * LEGEND_ITEM_W},${row * 22})`;
         })
         .style("cursor", "pointer")
         .on("click", (event, d) => {
@@ -245,11 +257,10 @@ function renderDialogueTimeline(container) {
             .text(`${d.character} (${d.total.toLocaleString()})`);
     });
 
-    const legendButtonWidth = 186;
-    const legendControlX = Math.max(0, width - legendButtonWidth);
-
+    // "Select All" button — own dedicated row below character items
+    const selectAllY = legendItemRows * 22;
     const legendControl = legend.append("g")
-        .attr("transform", `translate(${legendControlX},0)`)
+        .attr("transform", `translate(0,${selectAllY})`)
         .style("cursor", "pointer")
         .on("click", (event) => {
             event.stopPropagation();
@@ -258,42 +269,25 @@ function renderDialogueTimeline(container) {
 
     legendControl.append("rect")
         .attr("class", "legend-selectall-hitbox")
-        .attr("x", -4)
-        .attr("y", -4)
-        .attr("width", legendButtonWidth + 8)
-        .attr("height", 20)
-        .attr("fill", "transparent")
-        .on("click", (event) => {
-            event.stopPropagation();
-            setAllLegendCharacters(true);
-        });
+        .attr("x", -2).attr("y", -4)
+        .attr("width", 164).attr("height", 20)
+        .attr("fill", "transparent");
 
     legendControl.append("rect")
         .attr("class", "legend-selectall-bg")
-        .attr("x", -4)
-        .attr("y", -4)
-        .attr("width", legendButtonWidth)
-        .attr("height", 20)
+        .attr("x", 0).attr("y", -3)
+        .attr("width", 160).attr("height", 18)
         .attr("rx", 6)
         .attr("fill", "rgba(10, 24, 38, 0.84)")
-        .attr("stroke", "rgba(255, 214, 102, 0.65)")
-        .on("click", (event) => {
-            event.stopPropagation();
-            setAllLegendCharacters(true);
-        });
+        .attr("stroke", "rgba(255, 214, 102, 0.65)");
 
     legendControl.append("text")
         .attr("class", "legend-selectall-text")
-        .attr("x", 10)
-        .attr("y", 10)
+        .attr("x", 10).attr("y", 10)
         .style("fill", "#ffd766")
         .style("font-size", "11px")
         .style("font-weight", "700")
-        .text("Select All Characters")
-        .on("click", (event) => {
-            event.stopPropagation();
-            setAllLegendCharacters(true);
-        });
+        .text("Select All Characters");
 
     function getFilteredCharacters() {
         if (typeof globalState.selectedCharacter === "string" && MAIN_CHARACTERS.has(globalState.selectedCharacter)) {

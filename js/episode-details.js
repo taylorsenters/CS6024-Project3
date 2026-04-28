@@ -122,7 +122,7 @@ function renderEpisodeCharts() {
 }
 
 
-// ─── Bar Chart Rendering ────────────────────────────────────────────────────
+//  Bar Chart Rendering 
 
 function renderEpisodeBars(container, episodeArray) {
 
@@ -244,7 +244,7 @@ function renderEpisodeBars(container, episodeArray) {
 }
 
 
-// ─── Analysis Sections (Word Cloud + Network) ───────────────────────────────
+// Analysis Sections (Word Cloud + Network) 
 
 function renderAnalysisSection() {
     renderWordCloudSection();
@@ -286,7 +286,7 @@ function renderNetworkSection() {
 }
 
 
-// ─── Word Cloud ──────────────────────────────────────────────────────────────
+//  Word Cloud 
 
 function renderWordCloud() {
 
@@ -376,9 +376,7 @@ function renderWordCloud() {
 }
 
 
-// ─── Shared stop-word list ───────────────────────────────────────────────────
-// Apostrophes are stripped from tokens before this check, so contractions are
-// stored without them (don't → dont, i'm → im, etc.)
+// Shared stop-word list 
 
 const STOP_WORDS = new Set([
     // articles / determiners
@@ -437,7 +435,7 @@ const STOP_WORDS = new Set([
 ]);
 
 
-// ─── Word Frequency Builder ──────────────────────────────────────────────────
+// Word Frequency Builder 
 
 const APOSTROPHE_RE = /['\u2018\u2019\u02BC]/g;
 
@@ -467,7 +465,7 @@ function buildWordFrequency(rows) {
 }
 
 
-// ─── Phrase Frequency Builder ────────────────────────────────────
+// Phrase Frequency Builder 
 
 function buildPhraseFrequency(rows) {
 
@@ -510,7 +508,7 @@ function buildPhraseFrequency(rows) {
 }
 
 
-// ─── Phrase Renderer ─────────────────────────────────────────────────────────
+// Phrase Renderer 
 
 function renderPhrases(rows) {
 

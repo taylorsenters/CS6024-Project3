@@ -69,10 +69,13 @@ function renderLocationsSection() {
         };
     }
 
-    // ── Filter data ────────────────────────────────────────────────────────
+    // Filter data 
+
+    const BAD_LOCATION_RE = /^(same|later|moment|following|next\s+(morning|day|night|week)|meanwhile|continuous|immediately|shortly|soon\s+after|some\s+time|time\s+(later|passes)|the\s+next|days?\s+later|hours?\s+later|weeks?\s+later|years?\s+later|morning|night|evening|afternoon|earlier)/i;
 
     let data = cleanCharacterRows(globalState.data)
-        .filter(d => d.Location && d.Location.trim());
+        .filter(d => d.Location && d.Location.trim())
+        .filter(d => !BAD_LOCATION_RE.test(d.Location.trim()));
 
     if (globalState.selectedSeason !== "overall") {
         data = data.filter(d => d.Season === +globalState.selectedSeason);
@@ -91,7 +94,7 @@ function renderLocationsSection() {
         return;
     }
 
-    // ── Top locations (by total lines across all main characters) ──────────
+    // Top locations (by total lines across all main characters)
 
     const locTotals = new Map();
     data.forEach(d => locTotals.set(d.Location, (locTotals.get(d.Location) || 0) + 1));
@@ -101,7 +104,7 @@ function renderLocationsSection() {
         .slice(0, TOP_LOCATIONS)
         .map(([loc]) => loc);
 
-    // ── Pre-group: location → character → line count ───────────────────────
+    // Pre-group: location → character → line count 
 
     const grouped = new Map();
     data.forEach(row => {
@@ -111,7 +114,7 @@ function renderLocationsSection() {
         cm.set(row.Character, (cm.get(row.Character) || 0) + 1);
     });
 
-    // ── Build matrix ───────────────────────────────────────────────────────
+    // Build matrix 
 
     const characters = [...MAIN_CHARACTERS];
     const matrix = [];
@@ -127,7 +130,7 @@ function renderLocationsSection() {
     });
 
     renderHeatmap(chartDiv, matrix, topLocs, characters, globalMax);
-    renderDialogueTimeline(document.getElementById("dialogueTimelinePanel"));
+    renderDialogueTimeline(document.getElementById("dialogueTimelineSection"));
 }
 
 
@@ -138,7 +141,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
 
     // Fill available container width
     const containerW = (container.getBoundingClientRect().width || 860);
-    const margin  = { top: 62, right: 16, bottom: 16, left: Math.min(240, Math.max(170, containerW * 0.34)) };
+    const margin  = { top: 62, right: 16, bottom: 16, left: Math.min(280, Math.max(240, containerW * 0.35)) };
     const rowH    = containerW < 500 ? 44 : 56;
     const innerH  = locations.length * rowH;
     const innerW  = containerW - margin.left - margin.right;
@@ -185,7 +188,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
         .interpolator(d3.interpolateRgb("rgba(255,214,102,0.12)", "#ffd766"))
         .clamp(true);
 
-    // ── Subtle column highlight behind selected character ──────────────────
+    // Subtle column highlight behind selected character
     if (globalState.selectedCharacter && characters.includes(globalState.selectedCharacter)) {
         g.append("rect")
             .attr("x", x(globalState.selectedCharacter) - 2)
@@ -198,7 +201,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
             .attr("stroke-width", 1);
     }
 
-    // ── Character name headers ────────────────────────────────
+    //  Character name headers 
     g.selectAll(".char-label")
         .data(characters)
         .join("text")
@@ -225,41 +228,64 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
                 : "rgba(255,255,255,0.72)");
         });
 
-    // ── Location row labels ────────────────────────────────────────────────
+    //  Location row labels
+    const labelFontSize = containerW < 500 ? 12 : 14;
+    const IMG_W = 36, IMG_H = 22, IMG_GAP = 8;
+    const labelMaxWidth = margin.left - 10;
+
+    // Canvas for per-row image positioning
+    const measureCtx = document.createElement("canvas").getContext("2d");
+    measureCtx.font = `600 ${labelFontSize}px Arial`;
+
+    // Returns the pixel width of the widest wrapped line for a location label
+    function labelWidestLine(locName) {
+        const words = formatLocation(locName).split(/\s+/);
+        const lines = [];
+        let line = [];
+        for (const word of words) {
+            line.push(word);
+            if (measureCtx.measureText(line.join(" ")).width > labelMaxWidth && line.length > 1) {
+                line.pop(); lines.push(line.join(" ")); line = [word];
+            }
+        }
+        lines.push(line.join(" "));
+        return Math.max(...lines.map(l => measureCtx.measureText(l).width));
+    }
+
     g.selectAll(".loc-label")
         .data(locations)
         .join("text")
         .attr("class", "loc-label")
         .attr("x", -10)
-        .attr("y", d => y(d) + 14)
+        .attr("y", d => y(d) + y.bandwidth() / 2)
         .attr("text-anchor", "end")
-        .attr("dominant-baseline", "hanging")
+        .attr("dominant-baseline", "middle")
         .style("fill", "rgba(255,255,255,0.86)")
-        .style("font-size", containerW < 500 ? "12px" : "14px")
+        .style("font-size", `${labelFontSize}px`)
         .style("font-weight", "600")
-        .text(d => formatLocation(d));
+        .text(d => formatLocation(d))
+        .call(wrapSvgText, labelMaxWidth, labelFontSize);
 
-    // Location images below labels (if available)
+    // Location thumbnails 
     g.selectAll(".loc-thumb")
         .data(locations)
         .join("image")
         .attr("class", "loc-thumb")
         .attr("href", d => getLocationImagePath(d) || "")
-        .attr("x", -48)
-        .attr("y", d => y(d) + 28)
-        .attr("width", 36)
-        .attr("height", 22)
+        .attr("x", d => -10 - labelWidestLine(d) - IMG_GAP - IMG_W)
+        .attr("y", d => y(d) + (y.bandwidth() - IMG_H) / 2)
+        .attr("width", IMG_W)
+        .attr("height", IMG_H)
         .attr("rx", 4)
         .attr("opacity", d => getLocationImagePath(d) ? 0.96 : 0)
         .attr("preserveAspectRatio", "xMidYMid slice")
         .style("cursor", d => getLocationImagePath(d) ? "pointer" : "default")
         .on("click", (_, d) => {
-            let locationImagePath = getLocationImagePath(d);
-            if (!locationImagePath) return;
-            showLocationImagePopup(locationImagePath, formatLocation(d));
+            const path = getLocationImagePath(d);
+            if (path) showLocationImagePopup(path, formatLocation(d));
         });
 
-    // ── Cells ──────────────────────────────────────────────────────────────
+    //  Cells 
     const selected = typeof globalState.selectedCharacter === "string" ? globalState.selectedCharacter : "";
 
     g.selectAll(".hm-cell")
@@ -307,7 +333,7 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
             tooltip.style("opacity", 0);
         });
 
-    // ── Line count labels inside cells ──────────────
+    // Line count labels inside cells 
     if (colW >= 52) {
         g.selectAll(".cell-label")
             .data(matrix.filter(d => d.count > 0))
@@ -329,30 +355,6 @@ function renderHeatmap(container, matrix, locations, characters, globalMax) {
                 : d.count);
     }
 
-    // ── Color legend ───────────────────────────────────────────────────────
-    const legendW = Math.min(200, innerW * 0.3);
-    const legendH = 8;
-    const legendX = innerW - legendW;
-    const legendY = innerH + 4;
-
-    const legendGrad = defs.append("linearGradient").attr("id", "hmLegend");
-    legendGrad.append("stop").attr("offset", "0%").attr("stop-color", "rgba(255,214,102,0.12)");
-    legendGrad.append("stop").attr("offset", "100%").attr("stop-color", "#ffd766");
-
-    const lg = g.append("g").attr("transform", `translate(${legendX},${legendY})`);
-    lg.append("rect")
-        .attr("width", legendW).attr("height", legendH).attr("rx", 3)
-        .attr("fill", "url(#hmLegend)");
-    lg.append("text")
-        .attr("y", legendH + 12).attr("x", 0)
-        .style("fill", "rgba(255,255,255,0.45)").style("font-size", "14px")
-        .text("fewer lines");
-    lg.append("text")
-        .attr("y", legendH + 12).attr("x", legendW)
-        .attr("text-anchor", "end")
-        .style("fill", "rgba(255,255,255,0.45)").style("font-size", "14px")
-        .text("more lines");
-
     container.appendChild(svg.node());
 }
 
@@ -373,6 +375,45 @@ function selectCharacterFromChart(character) {
 
     renderCharacterCharts();
     renderEpisodeCharts();
+}
+
+
+function wrapSvgText(selection, maxWidth, fontSize) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.font = `600 ${fontSize}px Arial`;
+    const lineHeight = fontSize * 1.35;
+
+    selection.each(function () {
+        const text = d3.select(this);
+        const words = text.text().split(/\s+/);
+        const x = +text.attr("x");
+        const y = +text.attr("y");
+
+        text.text(null);
+
+        const lines = [];
+        let line = [];
+        for (const word of words) {
+            line.push(word);
+            if (ctx.measureText(line.join(" ")).width > maxWidth && line.length > 1) {
+                line.pop();
+                lines.push(line.join(" "));
+                line = [word];
+            }
+        }
+        lines.push(line.join(" "));
+
+        // Render tspans vertically centred around y
+        const totalH = (lines.length - 1) * lineHeight;
+        lines.forEach((lineText, i) => {
+            text.append("tspan")
+                .attr("x", x)
+                .attr("y", y - totalH / 2 + i * lineHeight)
+                .attr("dominant-baseline", "middle")
+                .text(lineText);
+        });
+    });
 }
 
 

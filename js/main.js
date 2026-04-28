@@ -98,7 +98,7 @@ let characterCards = [
 
 initializeThemeSongOnFirstLoad();
 
-// load your cleaned dataset
+// load cleaned dataset
 d3.csv("data/tbbt_cleaned_data.csv").then(data => {
 
     data.forEach(d => {
@@ -388,9 +388,6 @@ function renderImportanceBars(container, stats, metricKey, metricLabel) {
             renderEpisodeCharts();
             renderCharacterCharts();
 
-            document.getElementById("episodeCharts").scrollIntoView({
-                behavior: "smooth"
-            });
         };
 
         let widthPercent = (stat[metricKey] / maxValue) * 100;
