@@ -2,6 +2,7 @@
 # Project 3: The Big Bang Theory Dashboard
 
 An interactive D3.js dashboard for exploring dialogue patterns in _The Big Bang Theory_ across seasons, episodes, characters, locations, and co-presence networks.
+Live Application: [https://taylorsenters-cs-6024-project3.vercel.app/](https://taylorsenters-cs-6024-project3.vercel.app/)
 
 ---
 
