@@ -126,32 +126,32 @@ A stacked area chart emphasizes how the overall composition of dialogue shifts o
 
 Using this dashboard, it becomes much easier to notice patterns that are hard to see just by watching the show. The data tells a clearer story when everything is put into visual form.
 
-### **Sheldon's dominant presence**
+### **Sheldon's Dominant Presence**
 
 One thing that stands out right away is how dominant Sheldon is. His bars in the importance charts are consistently much longer than everyone else's, and the difference is not small. Across seasons, he speaks significantly more than the other characters, which shows how central he is to the show.
 
 ![Character Importance chart showing Sheldon dominating](<screenshots/Character Importance chart showing Sheldon dominating.png>)
 
-### **The apartment as the central setting**
+### **The Apartment as the Central Setting**
 
 The heatmap reveals that Sheldon and Leonard's apartment is the most active location by a wide margin. Almost every character speaks a lot there. The color intensity makes this obvious without requiring users to read exact numbers.
 
 ![Heatmap showing Sheldon & Leonard's apartment as the biggest location](<screenshots/Heatmap showing Sheldon & Leonard's apartment as the biggest location.png>)
 
-### **Character relationships and evolving connections**
+### **Character Relationships and Evolving Connections**
 
 The network charts show the strongest connection between Sheldon and Leonard, with a noticeably thicker edge than most others. Switching between seasons also shows how characters like Amy and Bernadette become more connected over time, reflecting their growing roles in later seasons.
 
 ![Network graphs highlighting strong Sheldon–Leonard connection](<screenshots/Network graphs highlighting strong Sheldon–Leonard connection.png>)
 
-### **Distinct character vocabularies**
+### **Distinct Character Vocabularies**
 
 The word cloud gives a different kind of insight. Each character has a distinct way of speaking — Sheldon's words relate more to science and logic, while Penny's connect to relationships and everyday life. These differences reveal personality through language in a way that is easy to overlook while casually watching.
 
 ![Sheldon Word Cloud](<screenshots/Sheldon Word Cloud.png>)
 ![Penny Word Cloud](<screenshots/Penny Word Cloud.png>)
 
-### **Character-focused episodes**
+### **Character-Focused Episodes**
 
 The episode chart shows that some episodes stand out with much taller bars, meaning a character spoke significantly more in those episodes. Clicking those episodes then updates the word cloud to reveal the specific themes that defined them.
 
@@ -194,7 +194,7 @@ https://github.com/taylorsenters/CS6024-Project3
 
 ## Demo Video
 
-\[Insert 2–3 minute demo video or YouTube link here\]
+Live Demo: [https://youtu.be/-gspk7piWt8](https://youtu.be/-gspk7piWt8)
 
 ---
 
