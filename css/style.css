@@ -3,6 +3,14 @@
 @import url("character-importance.css");
 @import url("episode-details.css");
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+svg {
+    max-width: 100%;
+}
+
 /* page style */
 body {
     font-family: Arial;
@@ -11,6 +19,7 @@ body {
         url("../images/Set theme.jpg") center center / cover fixed no-repeat;
     color: white;
     margin: 0;
+    overflow-x: hidden;
 }
 
 .page-shell {
@@ -47,7 +56,8 @@ body {
 #episodeCharts,
 #wordCloudSection,
 #networkSection,
-#locationsSection {
+#locationsSection,
+#dialogueTimelineSection {
     background-color: rgba(18, 43, 69, 0.94);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
@@ -142,13 +152,18 @@ body {
 #episodeCharts,
 #wordCloudSection,
 #networkSection,
-#locationsSection {
+#locationsSection,
+#dialogueTimelineSection {
     padding: 16px;
+}
+
+#dialogueTimelineSection {
+    margin-top: 20px;
 }
 
 .analysis-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 2fr;
     gap: 20px;
 }
 
